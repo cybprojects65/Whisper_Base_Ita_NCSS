@@ -106,7 +106,6 @@ if __name__ == "__main__":
 
     audio_cache = {}
     print("Preloading audio...")
-    snr = 'clean'
     for name in test_names:
         full_path = f"{audio_dir}/{name}"
         if not Path(full_path).exists():
