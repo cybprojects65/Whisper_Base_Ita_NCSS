@@ -56,6 +56,7 @@ if __name__ == "__main__":
     parser.add_argument("model_path", type=str, help="Path to the base model checkpoint") 
     parser.add_argument("lang",type=str,help="Pass the language code for model, Ex; It for Italian.")
     parser.add_argument("refText_path", type=str, help="Path to table containing audio paths & transciptions. Accepts both .xlsx and .csv")
+    parser.add_argument("testAudio_dir",type=str,help="directory containing the audio files.")
     parser.add_argument("output_path", type=str, help="Path to directory for saving the outputs.")     
     # Optional flag
     parser.add_argument("--use_finetuned",action="store_true",help="Use fine-tuned weights")
@@ -69,7 +70,9 @@ if __name__ == "__main__":
 
     model_path = args.model_path
     lang       = args.lang
+    table_path = args.refText_path
     ckpt_path  = args.finetuned_weights  #"whisper-base-it/checkpoint-6000"
+    audio_dir  = args.testAudio_dir
     output_dir = args.output_path
 
     # ---------------------------------------------------------
@@ -91,9 +94,8 @@ if __name__ == "__main__":
     # ---------------------------------------------------------
     # 3. Load table + Build Reference Dict
     # ---------------------------------------------------------
-    test_names = extract_input_files("asr_NVIDIA_FastConformer_Hybrid_Large (1).sh")
-    xlPath = "SELECTED/Selection_of_validated_speech.xlsx"
-    df     = load_table(fPath=xlPath,columns=["path","sentence","up_votes",])
+    test_names = extract_input_files("asr_NVIDIA_FastConformer_Hybrid_Large (1).sh") #this is an ad-hock code to get a lit of file names in a list, change this for your case. Make sure that the names here are also present in the directory of audio files.
+    df     = load_table(fPath=table_path,columns=["path","sentence","up_votes",])
     df     = df.filter(pl.col("up_votes") >= 5)
     ref_dict = make_path_sentence_dict(df)
     normalizer = TextNormalizer()
@@ -106,7 +108,7 @@ if __name__ == "__main__":
     print("Preloading audio...")
     snr = 'clean'
     for name in test_names:
-        full_path = f"SELECTED_NOISY/validated_upvotes_5_delta_{snr}/{name}"
+        full_path = f"{audio_dir}/{name}"
         if not Path(full_path).exists():
             warnings.warn(f"⚠️ File not found: {full_path}")
             continue
