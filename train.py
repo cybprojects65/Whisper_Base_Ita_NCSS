@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
 
     model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-base")
-    model.generation_config.language = "italian" #somehow i stupidly left it at hindi in the first Run
+    model.generation_config.language = "italian" 
     model.generation_config.task = "transcribe"
     model.generation_config.forced_decoder_ids = None
 
